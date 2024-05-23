@@ -5,15 +5,71 @@ const flipsAvailable = 2;
 let flippedCards = [];
 let pairs = 8;
 let attempts = 3;
+let score = 0;
+let pointsEarned = 1500
+let pointsdivision = 0;
+let gameStarted = false;
+
+function updateAttemptsCounter() 
+{
+    let attemptsCounter = document.getElementById('attempts-counter');
+    attemptsCounter.textContent = 'Attempts Left: ' + attempts;
+}
+
+function updateScoreDisplay() 
+{
+    let scoreDisplay = document.getElementById('score-display');
+    scoreDisplay.textContent = 'Score: ' + score;
+}
+
+
+const startGameButton = document.getElementById('start-game-button');
+startGameButton.addEventListener('click', function() 
+{
+    attempts = parseInt(document.getElementById('attempts-input').value);
+    updateAttemptsCounter();
+    score = 3000 / attempts;
+    pointsdivision =attempts;
+    updateScoreDisplay();
+    startGameButton.disabled = true;
+    gameStarted = true; 
+    cards.forEach(addClickListenerToCards);
+});
+
+const attemptsInput = document.getElementById('attempts-input');
+
+// Listen for changes in the input field
+attemptsInput.addEventListener('input', function() 
+{
+    // Get the current value of the input field
+    let value = parseInt(this.value);
+
+    // Check if the value is less than the minimum
+    if (value < parseInt(this.min)) {
+        this.value = this.min; // Set the value to the minimum
+    }
+
+    // Check if the value is greater than the maximum
+    if (value > parseInt(this.max)) {
+        this.value = this.max; // Set the value to the maximum
+    }
+});
+
+
 
 // Function to handle flipping a card
 function flipCard() 
 {
     // Check if the card can be flipped
-    if (!canFlip || this.classList.contains('matched') || flippedCards.length === flipsAvailable || !this.classList.contains('flipped')) 
+    if (!gameStarted||!canFlip || this.classList.contains('matched') || flippedCards.length === flipsAvailable || !this.classList.contains('flipped')) 
     {
         // Alert the user to select a different card
-        alert("Please select a different card.");
+        if(gameStarted)
+        {
+            alert("Please select a different card.");
+            return
+        }
+      
         return;
     }
     
@@ -37,8 +93,6 @@ function flipCard()
 // Function to compare the flipped cards
 function compareCards() 
 {
-    console.log("Comparing cards..."); 
-    
     // Ensure there are two flipped cards
     if (flippedCards.length !== flipsAvailable) 
     {
@@ -58,6 +112,7 @@ function compareCards()
     if (backgroundImageUrl1 === backgroundImageUrl2) 
     {
         console.log("match");
+        
         setTimeout(() => 
         {
             flippedCards.forEach(card => 
@@ -65,6 +120,8 @@ function compareCards()
                 card.classList.add('matched');
                 card.removeEventListener('click', flipCard);
             });
+            score += pointsEarned/pointsdivision
+            updateScoreDisplay()
             flippedCards = [];
             cardsFlipped = 0;
             canFlip = true;
@@ -96,6 +153,7 @@ function compareCards()
             cardsFlipped = 0;
             canFlip = true;
             attempts--
+            updateAttemptsCounter();
             console.log(attempts)
             if (attempts === 0) 
             {
@@ -204,3 +262,4 @@ tryAgainButton.addEventListener('click', function()
 {
     location.reload(); 
 });
+
